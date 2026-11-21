@@ -24,3 +24,4 @@ clap = { version = "4", features = ["derive"] }
 pulldown-cmark = "0.13"
 meval = "0.2"
 base64 = "0.22"
+regex = "1"

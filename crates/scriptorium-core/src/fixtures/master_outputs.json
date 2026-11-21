@@ -1,0 +1,44 @@
+[
+  {
+    "master": "M1",
+    "variant": null,
+    "body": "# Gradient Descent\n\n## Why Gradient Descent Exists\nWhen training differentiable models, closed-form optima are rarely tractable in high dimensions. Gradient descent iteratively reduces a differentiable loss function by stepping opposite to its local steepest ascent vector.\n\n## Geometric Intuition and Mathematical Formalism\nFor a differentiable objective $f: \\mathbb{R}^d \\to \\mathbb{R}$, the update rule at step $t$ with learning rate $\\eta > 0$ is:\n$$\\theta_{t+1} = \\theta_t - \\eta \\nabla f(\\theta_t)$$\nWhen $f$ is $L$-smooth, choosing $0 < \\eta < 2/L$ guarantees monotonic descent at every step.\n\n## Worked Numerical Trace\nTake $f(\\theta) = (\\theta - 3)^2$, so $f'(\\theta) = 2(\\theta - 3)$ and $L = 2$. Starting at $\\theta_0 = 0$ with $\\eta = 0.25$:\n- Step 1: $\\theta_1 = 0 - 0.25 \\cdot (-6) = 1.5$, $f(\\theta_1) = 2.25$.\n- Step 2: $\\theta_2 = 1.5 - 0.25 \\cdot (-3) = 2.25$, $f(\\theta_2) = 0.5625$.\n\n## Failure Modes and Pitfalls\nIf $\\eta > 2/L$ (here $\\eta > 1$), iterates overshoot and diverge geometrically. Ill-conditioned Hessians induce zig-zagging along high-curvature directions.\n\n## Revision Summary\nGradient descent follows $-\\nabla f(\\theta_t)$; stability requires $\\eta < 2/L$ under $L$-smoothness.\n",
+    "error_count": 0
+  },
+  {
+    "master": "M2",
+    "variant": "lecture_order",
+    "body": "# Lecture 4: Gradient Descent\n\n## 1. Source Context & Learning Goals\n> [!info] Source & Scope Context\n> - **Primary Source**: Lecture 4 Slides (pp. 1-14)\n> - **Access & Scope**: Complete slide deck; preserves exact lecture sequence.\n\n## 2. Sequential Concepts & Explanations\n### 2.1 Loss Landscape Setup\nThe lecture defines empirical risk $J(\\theta)$ and motivates iterative minimization.\n\n### 2.2 Update Rule and Step Size\nFollowing slide 7, $\\theta_{t+1} = \\theta_t - \\eta \\nabla J(\\theta_t)$.\n\n## 3. Key Takeaways & Active Recall\n- Steepest descent uses the negative gradient; verify step size against curvature.\n",
+    "error_count": 0
+  },
+  {
+    "master": "M3",
+    "variant": "formula_sheet",
+    "body": "# Gradient Descent — Formula Sheet\n\n| Equation | Symbols & Units | Applicability Condition |\n|---|---|---|\n| $\\theta_{t+1} = \\theta_t - \\eta \\nabla f(\\theta_t)$ | $\\theta_t \\in \\mathbb{R}^d$, $\\eta > 0$ | Differentiable $f$ |\n| $0 < \\eta < 2/L$ | $L$: Lipschitz constant of $\\nabla f$ | $L$-smooth objective |\n| $f(\\theta_T) - f(\\theta^*) \\le \\frac{\\|\\theta_0 - \\theta^*\\|^2}{2 \\eta T}$ | $T$: iterations | Convex + $L$-smooth, $\\eta \\le 1/L$ |\n\n- **Trap**: $\\eta > 2/L$ causes divergence on quadratics.\n",
+    "error_count": 0
+  },
+  {
+    "master": "M4",
+    "variant": null,
+    "body": "# Worked Solutions: Gradient Descent\n\n## Problem 1: Quadratic Minimization\n**Given**: $f(\\theta) = 2(\\theta - 4)^2$, initial point $\\theta_0 = 1$, learning rate $\\eta = 0.1$. Find $\\theta_1$, $\\theta_2$, and check stability.\n\n### Method Selection\nUse exact first-order gradient descent because $f$ is strictly convex and smooth with $L = f''(\\theta) = 4$.\n\n### Step-by-Step Solution\n1. Differentiate: $f'(\\theta) = 4(\\theta - 4)$.\n2. Compute step 1: $f'(1) = -12$, so $\\theta_1 = 1 - 0.1(-12) = 2.2$.\n3. Compute step 2: $f'(2.2) = 4(-1.8) = -7.2$, so $\\theta_2 = 2.2 - 0.1(-7.2) = 2.92$.\n\n### Final Answer & Verification Check\n- **Final Answer**: $\\theta_1 = 2.2$, $\\theta_2 = 2.92$.\n- **Sanity Check**: Loss decreased monotonically: $f(1) = 18 > f(2.2) = 6.48 > f(2.92) = 2.3328$, and $\\eta = 0.1 < 2/L = 0.5$ confirms stability.\n",
+    "error_count": 0
+  },
+  {
+    "master": "M5",
+    "variant": null,
+    "body": "# Implementation Guide: Gradient Descent in NumPy\n\n## Architecture & Core Invariant\nKeep parameter updates pure and track the monotonic descent invariant on convex $L$-smooth objectives.\n\n## Implementation\n```python\nimport numpy as np\n\ndef gradient_descent(grad_fn, theta0, lr=0.1, steps=50):\n    theta = np.array(theta0, dtype=float)\n    for _ in range(steps):\n        theta = theta - lr * grad_fn(theta)\n    return theta\n\nopt = gradient_descent(lambda x: 2.0 * (x - 3.0), [0.0], lr=0.25, steps=30)\nassert np.allclose(opt, [3.0], atol=1e-6)\n```\n\n## Verification & Edge Cases\n- **Test**: Converges to `3.0` within `1e-6` tolerance.\n- **Edge Case**: Guard against `lr <= 0` or `NaN` gradients when step size exceeds $2/L$.\n",
+    "error_count": 0
+  },
+  {
+    "master": "M6",
+    "variant": null,
+    "body": "# Gradient Descent — Active Recall Assessment\n\n## Tier 1: Core Recall\n### Q1. What condition on learning rate $\\eta$ guarantees descent for an $L$-smooth quadratic?\n> [!hint]- Need a nudge?\n> Relate $\\eta$ to the Lipschitz constant $L$ of the gradient.\n\n> [!tip]- Reveal approach and solution\n> **Final answer:** $0 < \\eta < 2/L$. Values above $2/L$ flip sign with magnitude $> 1$ and diverge.\n\n### Q2. Why does poor conditioning slow down vanilla gradient descent?\n> [!hint]- Need a nudge?\n> Compare curvature along the steepest and shallowest eigenvectors.\n\n> [!tip]- Reveal approach and solution\n> **Final answer:** The maximum stable step size is limited by the largest eigenvalue $L$, causing slow progress along small-eigenvalue directions.\n",
+    "error_count": 0
+  },
+  {
+    "master": "M7",
+    "variant": "comparison_guide",
+    "body": "# Gradient Descent vs Newton's Method\n\n## Executive Decision Rule\nChoose Gradient Descent for high-dimensional problems where $O(d^2)$ Hessian storage and $O(d^3)$ inversion are prohibitive; choose Newton's Method for low-dimensional strongly convex problems needing quadratic convergence.\n\n## Trade-Off Matrix\n| Criterion | Gradient Descent | Newton's Method |\n|---|---|---|\n| Per-step Cost | $O(d)$ | $O(d^3)$ |\n| Convergence Rate (Strongly Convex) | Linear | Local Quadratic |\n| Sensitivity to Conditioning | High | Affine-invariant |\n\n## Synthesis Takeaway\nQuasi-Newton methods (L-BFGS) bridge these two extremes using curvature approximations in $O(md)$ memory.\n",
+    "error_count": 0
+  }
+]
